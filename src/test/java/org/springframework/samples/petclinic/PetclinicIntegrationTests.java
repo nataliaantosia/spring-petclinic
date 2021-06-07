@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.samples.petclinic.vet.VetRepository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 class PetclinicIntegrationTests {
 
@@ -31,6 +33,7 @@ class PetclinicIntegrationTests {
 	void testFindAll() throws Exception {
 		vets.findAll();
 		vets.findAll(); // served from cache
+		assertThat(vets.findAll()).hasSize(6);
 	}
 
 }
