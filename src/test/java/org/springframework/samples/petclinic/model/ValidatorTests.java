@@ -16,6 +16,7 @@
 
 package org.springframework.samples.petclinic.model;
 
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Set;
 
@@ -41,20 +42,67 @@ class ValidatorTests {
 	}
 
 	@Test
-	void shouldNotValidateWhenFirstNameEmpty1() {
-
+	void shouldNotValidateWhenFirstNameEmpty() {
+// given
 		LocaleContextHolder.setLocale(Locale.ENGLISH);
 		Person person = new Person();
-		person.setFirstName("antinia");
+		person.setFirstName("");
 		person.setLastName("pe");
-
+// when
 		Validator validator = createValidator();
 		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
-
-		assertThat(constraintViolations).hasSize(0);
-		//ConstraintViolation<Person> violation = constraintViolations.iterator().next();
-		//assertThat(violation.getPropertyPath().toString()).isEqualTo("firstName");
-		//assertThat(violation.getMessage()).isEqualTo("must not be empty");
+// then
+		assertThat(constraintViolations).hasSize(1);
+		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
+		assertThat(violation.getPropertyPath().toString()).isEqualTo("firstName");
+		assertThat(violation.getMessage()).isEqualTo("must not be empty");
 	}
 
+	@Test
+	void shouldNotValidateWhenSecondNameEmpty() {
+		// given
+		LocaleContextHolder.setLocale(Locale.ENGLISH);
+		Person person = new Person();
+		person.setFirstName("anto");
+		person.setLastName("");
+// when
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
+// then
+		assertThat(constraintViolations).hasSize(1);
+		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
+		assertThat(violation.getPropertyPath().toString()).isEqualTo("lastName");
+		assertThat(violation.getMessage()).isEqualTo("must not be empty");
+	}
+
+	@Test
+	void shouldNotValidateWhenBothNameEmpty() {
+		//given
+		Person person = new Person();
+		person.setFirstName("");
+		person.setLastName("");
+		//when
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
+		//then
+		assertThat(constraintViolations).hasSize(2);
+		ArrayList<ConstraintViolation<Person>> constraintViolationsList = new ArrayList<>(constraintViolations);
+		//ConstraintViolation<Person> violation = constraintViolations.iterator().next();
+		assertThat(constraintViolationsList.get(0).getPropertyPath().toString()).isEqualTo("firstName");
+		assertThat(constraintViolationsList.get(0).getMessage()).isEqualTo("must not be empty");
+		assertThat(constraintViolationsList.get(1).getPropertyPath().toString()).isEqualTo("lastName");
+		assertThat(constraintViolationsList.get(1).getMessage()).isEqualTo("must not be empty");
+	}
+	@Test
+	void shouldValidateWhenBothNameNotEmpty() {
+		//given
+		Person person = new Person();
+		person.setFirstName("Antosia");
+		person.setLastName("Słonusia");
+		//when
+		Validator validator = createValidator();
+		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
+		//then
+		assertThat(constraintViolations).hasSize(0);
+	}
 }
